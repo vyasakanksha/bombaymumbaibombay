@@ -30,34 +30,95 @@
 
 <script src="https://www.gstatic.com/firebasejs/4.10.1/firebase.js"></script>
 <script>
-  // Initialize Firebase
-  var config = {
-    apiKey: "AIzaSyAI6XI-Dx00sr0B3OkzFkWegVqp_HEUPVg",
-    authDomain: "feeling-bombay.firebaseapp.com",
-    databaseURL: "https://feeling-bombay.firebaseio.com",
-    projectId: "feeling-bombay",
-    storageBucket: "feeling-bombay.appspot.com",
-    messagingSenderId: "249442066662"
-  };
-  firebase.initializeApp(config);
-</script>
+// Initialize Firebase
+var config = {
+   apiKey: "AIzaSyAI6XI-Dx00sr0B3OkzFkWegVqp_HEUPVg",
+   authDomain: "feeling-bombay.firebaseapp.com",
+   databaseURL: "https://feeling-bombay.firebaseio.com",
+   projectId: "feeling-bombay",
+   storageBucket: "feeling-bombay.appspot.com",
+   messagingSenderId: "249442066662"
+};
+firebase.initializeApp(config);
 
+var data = {
+  sender: null,
+  feeling: null,
+  timestamp: null,
+  lat: null,
+  lng: null
+};
 
- <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAykwwAbyvWy5DiYn0-0aPBaPSrCqs9Gx4&callback=initMap">
-</script>
+function initAuthentication(onAuthSuccess) {
+  firebase.auth().signInAnonymously().catch(function(error) {
+     // Handle Errors here.
+     var errorCode = error.code;
+     var errorMessage = error.message;
+});
 
-<script>
+   firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+         // User is signed in.
+         var test = user.uid;
+         console.log(test);
+         onAuthSuccess();
+      }
+   });
+}
+
 function initMap() {
    var uluru = {lat: 19.074, lng: 72.877};
    var map = new google.maps.Map(document.getElementById('map'), {
       zoom: 12,
-      center: uluru
+      center: uluru,
+      styles: [{
+      featureType: 'poi',
+      stylers: [{ visibility: 'off' }]  // Turn off points of interest.
+    }, {
+      featureType: 'transit.station',
+      stylers: [{ visibility: 'off' }]  // Turn off bus stations, train stations, etc.
+    }],
+    disableDoubleClickZoom: true,
+    streetViewControl: false
    });
    var marker = new google.maps.Marker({
       position: uluru,
       map: map
    });
+
+  // Listen for clicks and add the location of the click to firebase.
+  map.addListener('click', function(e) {
+    data.lat = e.latLng.lat();
+    data.lng = e.latLng.lng();
+    //addToFirebase(data);
+    console.log(data);
+  });
+
+  initAuthentication(initFirebase.bind(undefined));
 }
+
+
+function initFirebase() {
+    // Reference to the clicks in Firebase.
+    //var clicks = firebase.child('clicks');
+    var clicks = firebase.database().ref().child('clicks')
+
+   // 10 minutes before current time.
+   var startTime = new Date().getTime() - (60 * 10 * 1000);
+
+   // Listener for when a click is added - add it to the heatmap.
+   clicks.orderByChild('timestamp').startAt(startTime).on('child_added',
+     function(snapshot) {
+       var newPosition = snapshot.val();
+       var point = new google.maps.LatLng(newPosition.lat, newPosition.lng);
+       console.log(point);
+     }
+   );
+
+}
+
+</script>
+ <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAykwwAbyvWy5DiYn0-0aPBaPSrCqs9Gx4&libraries=visualization&callback=initMap">
 </script>
 
