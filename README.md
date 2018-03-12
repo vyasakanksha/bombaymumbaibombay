@@ -1,2 +1,2 @@
 # bombaymumbaibombay
-From Mumbai to Bombay and back to Bombay
+From Bombay to Mumbai and back to Bombay
