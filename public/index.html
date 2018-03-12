@@ -49,7 +49,7 @@ var data = {
   lng: null
 };
 
-function initAuthentication(onAuthSuccess) {
+function initAuthentication(onAuthSuccess, data) {
   firebase.auth().signInAnonymously().catch(function(error) {
      // Handle Errors here.
      var errorCode = error.code;
@@ -59,8 +59,7 @@ function initAuthentication(onAuthSuccess) {
    firebase.auth().onAuthStateChanged(function(user) {
       if (user) {
          // User is signed in.
-         var test = user.uid;
-         console.log(test);
+         data.sender = user.uid;
          onAuthSuccess();
       }
    });
@@ -91,10 +90,15 @@ function initMap() {
     data.lat = e.latLng.lat();
     data.lng = e.latLng.lng();
     //addToFirebase(data);
+    lu = {lat: data.lat, lng: data.lng};
+    var marker = new google.maps.Marker({
+      position: lu,
+      map: map
+   });
     console.log(data);
   });
 
-  initAuthentication(initFirebase.bind(undefined));
+  initAuthentication(initFirebase.bind(undefined), data);
 }
 
 
