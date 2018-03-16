@@ -3,6 +3,7 @@
   <head>
    <meta name="viewport" content="width=device-width, initial-scale=1">
    <link rel="stylesheet" type="text/css" href="button.css">
+   <link rel="stylesheet" type="text/css" href="simple-grid.css">
     <style>
        #map {
         height: 500px;
@@ -11,17 +12,54 @@
     </style>
   </head>
   <body>
-    <h3>My Google Maps Demo</h3>
-    <button onclick="emoButton('joy','mm_20_green.png')"class="button-success pure-button" style="background-color:#66D867">Joy</button>
-    <button onclick="emoButton('sad', 'mm_20_orange.png')"class="button-success pure-button" style="background-color:#F1C330">Sad</button>
-    <button onclick="emoButton('fear','mm_20_gray.png')"class="button-success pure-button" style="background-color:#BFBFBF">Fear</button>
-    <button onclick="emoButton('rage', 'mm_20_red.png')"class="button-success pure-button" style="background-color:#FC4456">Rage</button>
-    <button onclick="emoButton('filthy', 'mm_20_yellow.png')"class="button-success pure-button" style="background-color:#F2F06B">Filthy</button>
-    <button onclick="emoButton('clean', 'mm_20_white.png')"class="button-success pure-button" style="background-color:#FFFFFF;color:black">Clean</button>
-    <button onclick="emoButton('serene', 'mm_20_blue.png')"class="button-success pure-button" style="background-color:#5A5FFB">Serene</button>
-    <button onclick="emoButton('chaotic', 'mm_20_black.png')"class="button-success pure-button" style="background-color:#000000">Chaotic</button>
-    <button onclick="emoButton('love', 'mm_20_purple.png')"class="button-success pure-button" style="background-color:#E457E4">Love</button>
-    <button onclick="emoButton('unsafe', 'mm_20_brown.png')"class="button-success pure-button" style="backgound-color:#CBA06A">Unsafe</button>
+    <h1 align="center" style="font-family: Courier New, serif">Bombay To Mumbai To Bombay Again</h1>
+    <h6 align="center" style="font-family: Courier New, serif">This project was the created by Shaina Patel and Akanksha Vyas with the support of the Baud Ji LaL Museaum and ZKM. </h1>
+    <div class="container">
+       <div class="row">
+         <div class="col-4">
+          <button onclick="feelings_activate()" class="large-button pure-button" style="background-color:#66D867">Migration Patterns</a>
+         </div>
+         <div class="col-4">
+           <button onclick=""class="large-button pure-button" style="background-color:#66D867">Geographical Shifts</button>
+         </div>
+         <div class="col-4">
+           <button onclick=""class="large-button pure-button" style="background-color:#66D867">Feelings</button>
+         </div>
+       </div>
+    </div>
+    <div class="container" id="feelings" style="visibility:hidden";>
+       <div class="row">
+          <div class="col-1.5">
+             <button onclick="emoButton('joy','mm_20_green.png')"class="button-success pure-button" style="background-color:#66D867">Joy</button>
+          </div>
+         <div class="col-1.5">
+            <button onclick="emoButton('sad', 'mm_20_orange.png')"class="button-success pure-button" style="background-color:#F1C330">Sad</button>
+         </div>
+         <div class="col-1.5">
+            <button onclick="emoButton('fear','mm_20_gray.png')"class="button-success pure-button" style="background-color:#BFBFBF">Fear</button>
+         </div>
+         <div class="col-1.5">
+            <button onclick="emoButton('rage', 'mm_20_red.png')"class="button-success pure-button" style="background-color:#FC4456">Rage</button>
+         </div>
+         <div class="col-1.5">
+            <button onclick="emoButton('filthy', 'mm_20_yellow.png')"class="button-success pure-button" style="background-color:#F2F06B">Filthy</button>
+         </div>
+         <div class="col-1.5">
+            <button onclick="emoButton('clean', 'mm_20_white.png')"class="button-success pure-button" style="background-color:#FFFFFF;color:black">Clean</button>
+         </div>
+         <div class="col-1.5">
+           <button onclick="emoButton('serene', 'mm_20_blue.png')"class="button-success pure-button" style="background-color:#5A5FFB">Serene</button>
+         </div>
+         <div class="col-1.5">
+             <button onclick="emoButton('chaotic', 'mm_20_black.png')"class="button-success pure-button" style="background-color:#000000">Chaotic</button>
+         </div>
+         <div class="col-1.5">
+            <button onclick="emoButton('love', 'mm_20_purple.png')"class="button-success pure-button" style="background-color:#E457E4">Love</button>
+         </div>
+         <div class="col-1.5">
+            <button onclick="emoButton('unsafe', 'mm_20_brown.png')"class="button-success pure-button" style="backgound-color:#CBA06A">Unsafe</button>
+         </div>
+       </div>
     </div>
     <div id="map"></div>
   </body>
@@ -177,8 +215,13 @@ function addToFirebase(data) {
  });
 }
 
+function feelings_activate() {
+   document.getElementById('feelings').style.visibility = "visible";
+   initMap();
+}
+
 </script>
  <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAykwwAbyvWy5DiYn0-0aPBaPSrCqs9Gx4&libraries=visualization&callback=initMap">
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAykwwAbyvWy5DiYn0-0aPBaPSrCqs9Gx4&libraries=visualization">
 </script>
 
