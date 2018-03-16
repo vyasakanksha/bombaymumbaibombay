@@ -13,16 +13,16 @@
   <body>
     <h3>My Google Maps Demo</h3>
     <div style="height:50px">
-    <button class="button-success pure-button">Joy</button>
-    <button class="button-success pure-button">Sad</button>
-    <button class="button-success pure-button">Fear</button>
-    <button class="button-success pure-button">Rage</button>
-    <button class="button-success pure-button">Filthy</button>
-    <button class="button-success pure-button">Clean</button>
-    <button class="button-success pure-button">Serene</button>
-    <button class="button-success pure-button">Chaotic</button>
-    <button class="button-success pure-button">Love</button>
-    <button class="button-success pure-button">Unsafe</button>
+    <button onclick="emoButton('joy','mm_20_green.png')"class="button-success pure-button" style="background-color:green">Joy</button>
+    <button onclick="emoButton('sad', 'mm_20_orange.png')"class="button-success pure-button" style="background-color:orange">Sad</button>
+    <button onclick="emoButton('fear','mm_20_gray.png')"class="button-success pure-button" style="background-color:dimgrey">Fear</button>
+    <button onclick="emoButton('rage', 'mm_20_red.png')"class="button-success pure-button" style="background-color:DarkRed">Rage</button>
+    <button onclick="emoButton('filthy', 'mm_20_yellow.png')"class="button-success pure-button" style="background-color:YellowGreen">Filthy</button>
+    <button onclick="emoButton('clean', 'mm_20_white.png')"class="button-success pure-button" style="background-color:white;color:black">Clean</button>
+    <button onclick="emoButton('serene', 'mm_20_blue.png')"class="button-success pure-button" style="background-color:LightBlue">Serene</button>
+    <button onclick="emoButton('chaotic', 'mm_20_black.png')"class="button-success pure-button" style="background-color:Black">Chaotic</button>
+    <button onclick="emoButton('love', 'mm_20_purple')"class="button-success pure-button" style="background-color:purple">Love</button>
+    <button onclick="emoButton('unsafe', 'mm_20_brown.png')"class="button-success pure-button" style="backgound-color:black">Unsafe</button>
     </div>
     <div id="map"></div>
   </body>
@@ -44,6 +44,7 @@ firebase.initializeApp(config);
 var data = {
   sender: null,
   feeling: null,
+  color: null,
   timestamp: null,
   lat: null,
   lng: null
@@ -65,25 +66,27 @@ function initAuthentication(onAuthSuccess, data) {
    });
 }
 
+function emoButton(emotion, col) {
+   data.feeling = emotion;
+   data.color = col;
+}
+
+
 function initMap() {
    var uluru = {lat: 19.074, lng: 72.877};
    var map = new google.maps.Map(document.getElementById('map'), {
       zoom: 12,
       center: uluru,
       styles: [{
-      featureType: 'poi',
-      stylers: [{ visibility: 'off' }]  // Turn off points of interest.
-    }, {
-      featureType: 'transit.station',
-      stylers: [{ visibility: 'off' }]  // Turn off bus stations, train stations, etc.
-    }],
-    disableDoubleClickZoom: true,
-    streetViewControl: false
-   });
-   var marker = new google.maps.Marker({
-      position: uluru,
-      map: map
-   });
+         featureType: 'poi',
+         stylers: [{ visibility: 'off' }]  // Turn off points of interest.
+         }, {
+            featureType: 'transit.station',
+            stylers: [{ visibility: 'off' }]  // Turn off bus stations, train stations, etc.
+            }],
+            disableDoubleClickZoom: true,
+            streetViewControl: false
+         });
 
   // Listen for clicks and add the location of the click to firebase.
   map.addListener('click', function(e) {
@@ -91,34 +94,88 @@ function initMap() {
     data.lng = e.latLng.lng();
     //addToFirebase(data);
     lu = {lat: data.lat, lng: data.lng};
+    var temp =  'http://labs.google.com/ridefinder/images/' + data.color
     var marker = new google.maps.Marker({
       position: lu,
-      map: map
+      map: map,
+      icon: temp
    });
-    console.log(data);
+   addToFirebase(data);
   });
 
-  initAuthentication(initFirebase.bind(undefined), data);
+  initAuthentication(initFirebase.bind(undefined, map), data);
 }
 
 
-function initFirebase() {
+function initFirebase(map) {
     // Reference to the clicks in Firebase.
     //var clicks = firebase.child('clicks');
-    var clicks = firebase.database().ref().child('clicks')
+    var clicks = firebase.database().ref().child('clicks');
+    console.log(clicks);
 
    // 10 minutes before current time.
    var startTime = new Date().getTime() - (60 * 10 * 1000);
 
-   // Listener for when a click is added - add it to the heatmap.
-   clicks.orderByChild('timestamp').startAt(startTime).on('child_added',
-     function(snapshot) {
-       var newPosition = snapshot.val();
-       var point = new google.maps.LatLng(newPosition.lat, newPosition.lng);
-       console.log(point);
+   clicks.on('value', function(snapshot) {
+       snap = snapshot.val();
+       for (s in snap) {
+          var newPosition = snap[s];
+          var lu = {lat: newPosition.lat, lng: newPosition.lng};
+          var temp_hs =  'http://labs.google.com/ridefinder/images/' + newPosition.color
+          var marker = new google.maps.Marker({
+             position: lu,
+             map: map,
+             icon: temp_hs
+          });
+       }
      }
    );
 
+}
+
+/**
+       * Updates the last_message/ path with the current timestamp.
+       * @param {function(Date)} addClick After the last message timestamp has been updated,
+       *     this function is called with the current timestamp to add the
+       *     click to the firebase.
+       */
+function getTimestamp(addClick) {
+   // Reference to location for saving the last click time.
+   var ref = firebase.database().ref().child('last_message/' + data.sender);
+
+   ref.onDisconnect().remove();  // Delete reference from firebase on disconnect.
+
+   // Set value to timestamp.
+   ref.set(firebase.database.ServerValue.TIMESTAMP, function(err) {
+     if (err) {  // Write to last message was unsuccessful.
+       console.log(err);
+     } else {  // Write to last message was successful.
+       ref.once('value', function(snap) {
+         addClick(snap.val());  // Add click with same timestamp.
+       }, function(err) {
+         console.warn(err);
+       });
+     }
+   });
+}
+
+
+/**
+       * Adds a click to firebase.
+       * @param {Object} data The data to be added to firebase.
+       *     It contains the lat, lng, sender and timestamp.
+       */
+function addToFirebase(data) {
+   getTimestamp(function(timestamp) {
+   // Add the new timestamp to the record data.
+   data.timestamp = timestamp;
+   console.log(data);
+   var ref = firebase.database().ref().child('clicks').push(data, function(err) {
+     if (err) {  // Data was not written to firebase.
+       console.warn(err);
+     }
+   });
+ });
 }
 
 </script>
