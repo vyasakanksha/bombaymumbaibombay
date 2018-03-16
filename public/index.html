@@ -17,13 +17,13 @@
     <div class="container">
        <div class="row">
          <div class="col-4">
-          <button onclick="feelings_activate()" class="large-button pure-button" style="background-color:#66D867">Migration Patterns</a>
+          <button onclick="" class="large-button pure-button" style="background-color:#66D867">Migration Patterns</a>
          </div>
          <div class="col-4">
            <button onclick=""class="large-button pure-button" style="background-color:#66D867">Geographical Shifts</button>
          </div>
          <div class="col-4">
-           <button onclick=""class="large-button pure-button" style="background-color:#66D867">Feelings</button>
+           <button onclick="feelings_activate()"class="large-button pure-button" style="background-color:#66D867">Feelings</button>
          </div>
        </div>
     </div>
@@ -87,6 +87,28 @@ var data = {
   lng: null
 };
 
+function makeInfoBox(controlDiv, map) {
+   // Set CSS for the control border.
+   var controlUI = document.createElement('div');
+   controlUI.style.boxShadow = 'rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px';
+   controlUI.style.backgroundColor = '#fff';
+   controlUI.style.border = '2px solid #fff';
+   controlUI.style.borderRadius = '2px';
+   controlUI.style.marginBottom = '22px';
+   controlUI.style.marginTop = '10px';
+   controlUI.style.textAlign = 'center';
+   controlDiv.appendChild(controlUI);
+
+   // Set CSS for the control interior.
+   var controlText = document.createElement('div');
+   controlText.style.color = 'rgb(25,25,25)';
+   controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
+   controlText.style.fontSize = '100%';
+   controlText.style.padding = '6px';
+   controlText.textContent = 'Pick an emotion or feeling and click on a point on the map where you were feeling like that';
+   controlUI.appendChild(controlText);
+}
+
 function initAuthentication(onAuthSuccess, data) {
   firebase.auth().signInAnonymously().catch(function(error) {
      // Handle Errors here.
@@ -125,6 +147,9 @@ function initMap() {
             streetViewControl: false
          });
 
+  var infoBoxDiv = document.createElement('div');
+  makeInfoBox(infoBoxDiv, map);
+  map.controls[google.maps.ControlPosition.TOP_CENTER].push(infoBoxDiv);
   // Listen for clicks and add the location of the click to firebase.
   map.addListener('click', function(e) {
     data.lat = e.latLng.lat();
