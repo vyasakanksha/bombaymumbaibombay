@@ -2,6 +2,8 @@
 <html>
   <head>
    <meta name="viewport" content="width=device-width, initial-scale=1">
+   <script src="https://www.gstatic.com/firebasejs/4.10.1/firebase.js"></script>
+   <script src="main.js"></script>
    <link rel="stylesheet" type="text/css" href="button.css">
    <link rel="stylesheet" type="text/css" href="simple-grid.css">
     <style>
@@ -12,15 +14,17 @@
     </style>
   </head>
   <body>
-    <h1 align="center" style="font-family: Courier New, serif">Bombay To Mumbai To Bombay Again</h1>
+    <h1 align="center" style="font-family: Courier New, serif">Bombay To Mumbai And Bombay Again</h1>
     <h6 align="center" style="font-family: Courier New, serif">This project was the created by Shaina Patel and Akanksha Vyas with the support of the Baud Ji LaL Museaum and ZKM. </h1>
+    <p style="font-family: Courier New, serif; font-size:13px"> Maps are traditionally representative artificial borders and boundaries that divide our world. We are here to create maps that connect us, the people of Bombay, of Mumbai, instead of dividing us. We live in a city of immigrants. Different people from vastly different backgrounds have happened upon this city in different ways, and we experience the city in different ways. Yet this city is the one thing that ties us together. Together, lets create maps that reflect this. </p>
+    <p style="font-family: Courier New, serif; font-size:12px"> Shaina is an economist and budding data scientist. She is currently an economic statistics data analyst at Bloomberg. She has majored in economics at St. Xavier's College, Mumbai. Akanksha is mathematician and engineer with a Master’s in Probabilistic Algorithms. Currently, she is a co-founder (Engineering and Design lead) at a health-tech startup, Fited. </p>
     <div class="container">
        <div class="row">
          <div class="col-4">
-          <button onclick="" class="large-button pure-button" style="background-color:#66D867">Migration Patterns</a>
+          <button onclick="migration_activate()" class="large-button pure-button" style="background-color:#66D867">Migration Patterns</a>
          </div>
          <div class="col-4">
-           <button onclick=""class="large-button pure-button" style="background-color:#66D867">Geographical Shifts</button>
+           <button onclick="geography_activate()"class="large-button pure-button" style="background-color:#66D867">Geographical Shifts</button>
          </div>
          <div class="col-4">
            <button onclick="feelings_activate()"class="large-button pure-button" style="background-color:#66D867">Feelings</button>
@@ -57,195 +61,18 @@
             <button onclick="emoButton('love', 'mm_20_purple.png')"class="button-success pure-button" style="background-color:#E457E4">Love</button>
          </div>
          <div class="col-1.5">
-            <button onclick="emoButton('unsafe', 'mm_20_brown.png')"class="button-success pure-button" style="backgound-color:#CBA06A">Unsafe</button>
+            <button onclick="emoButton('unsafe', 'mm_20_brown.png')"class="button-success pure-button" style="background-color:#CBA06A">Unsafe</button>
          </div>
        </div>
     </div>
     <div id="map"></div>
+    <div id="geog" class="container" style="visibility=hidden">
+        makeInfoBox(infoBoxDiv, map);
+        <a style="color=black"> dates go here </a>
+    </div>
   </body>
 </html>
 
-<script src="https://www.gstatic.com/firebasejs/4.10.1/firebase.js"></script>
-<script>
-// Initialize Firebase
-var config = {
-   apiKey: "AIzaSyAI6XI-Dx00sr0B3OkzFkWegVqp_HEUPVg",
-   authDomain: "feeling-bombay.firebaseapp.com",
-   databaseURL: "https://feeling-bombay.firebaseio.com",
-   projectId: "feeling-bombay",
-   storageBucket: "feeling-bombay.appspot.com",
-   messagingSenderId: "249442066662"
-};
-firebase.initializeApp(config);
-
-var data = {
-  sender: null,
-  feeling: null,
-  color: null,
-  timestamp: null,
-  lat: null,
-  lng: null
-};
-
-function makeInfoBox(controlDiv, map) {
-   // Set CSS for the control border.
-   var controlUI = document.createElement('div');
-   controlUI.style.boxShadow = 'rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px';
-   controlUI.style.backgroundColor = '#fff';
-   controlUI.style.border = '2px solid #fff';
-   controlUI.style.borderRadius = '2px';
-   controlUI.style.marginBottom = '22px';
-   controlUI.style.marginTop = '10px';
-   controlUI.style.textAlign = 'center';
-   controlDiv.appendChild(controlUI);
-
-   // Set CSS for the control interior.
-   var controlText = document.createElement('div');
-   controlText.style.color = 'rgb(25,25,25)';
-   controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
-   controlText.style.fontSize = '100%';
-   controlText.style.padding = '6px';
-   controlText.textContent = 'Pick an emotion or feeling and click on a point on the map where you were feeling like that';
-   controlUI.appendChild(controlText);
-}
-
-function initAuthentication(onAuthSuccess, data) {
-  firebase.auth().signInAnonymously().catch(function(error) {
-     // Handle Errors here.
-     var errorCode = error.code;
-     var errorMessage = error.message;
-});
-
-   firebase.auth().onAuthStateChanged(function(user) {
-      if (user) {
-         // User is signed in.
-         data.sender = user.uid;
-         onAuthSuccess();
-      }
-   });
-}
-
-function emoButton(emotion, col) {
-   data.feeling = emotion;
-   data.color = col;
-}
-
-
-function initMap() {
-   var uluru = {lat: 19.074, lng: 72.877};
-   var map = new google.maps.Map(document.getElementById('map'), {
-      zoom: 12,
-      center: uluru,
-      styles: [{
-         featureType: 'poi',
-         stylers: [{ visibility: 'off' }]  // Turn off points of interest.
-         }, {
-            featureType: 'transit.station',
-            stylers: [{ visibility: 'off' }]  // Turn off bus stations, train stations, etc.
-            }],
-            disableDoubleClickZoom: true,
-            streetViewControl: false
-         });
-
-  var infoBoxDiv = document.createElement('div');
-  makeInfoBox(infoBoxDiv, map);
-  map.controls[google.maps.ControlPosition.TOP_CENTER].push(infoBoxDiv);
-  // Listen for clicks and add the location of the click to firebase.
-  map.addListener('click', function(e) {
-    data.lat = e.latLng.lat();
-    data.lng = e.latLng.lng();
-    //addToFirebase(data);
-    lu = {lat: data.lat, lng: data.lng};
-    var temp =  'http://labs.google.com/ridefinder/images/' + data.color
-    var marker = new google.maps.Marker({
-      position: lu,
-      map: map,
-      icon: temp
-   });
-   addToFirebase(data);
-  });
-
-  initAuthentication(initFirebase.bind(undefined, map), data);
-}
-
-
-function initFirebase(map) {
-    // Reference to the clicks in Firebase.
-    //var clicks = firebase.child('clicks');
-    var clicks = firebase.database().ref().child('clicks');
-    console.log(clicks);
-
-   // 10 minutes before current time.
-   var startTime = new Date().getTime() - (60 * 10 * 1000);
-
-   clicks.on('value', function(snapshot) {
-       snap = snapshot.val();
-       for (s in snap) {
-          var newPosition = snap[s];
-          var lu = {lat: newPosition.lat, lng: newPosition.lng};
-          var temp_hs =  'http://labs.google.com/ridefinder/images/' + newPosition.color
-          var marker = new google.maps.Marker({
-             position: lu,
-             map: map,
-             icon: temp_hs
-          });
-       }
-     }
-   );
-
-}
-
-/**
-       * Updates the last_message/ path with the current timestamp.
-       * @param {function(Date)} addClick After the last message timestamp has been updated,
-       *     this function is called with the current timestamp to add the
-       *     click to the firebase.
-       */
-function getTimestamp(addClick) {
-   // Reference to location for saving the last click time.
-   var ref = firebase.database().ref().child('last_message/' + data.sender);
-
-   ref.onDisconnect().remove();  // Delete reference from firebase on disconnect.
-
-   // Set value to timestamp.
-   ref.set(firebase.database.ServerValue.TIMESTAMP, function(err) {
-     if (err) {  // Write to last message was unsuccessful.
-       console.log(err);
-     } else {  // Write to last message was successful.
-       ref.once('value', function(snap) {
-         addClick(snap.val());  // Add click with same timestamp.
-       }, function(err) {
-         console.warn(err);
-       });
-     }
-   });
-}
-
-
-/**
-       * Adds a click to firebase.
-       * @param {Object} data The data to be added to firebase.
-       *     It contains the lat, lng, sender and timestamp.
-       */
-function addToFirebase(data) {
-   getTimestamp(function(timestamp) {
-   // Add the new timestamp to the record data.
-   data.timestamp = timestamp;
-   console.log(data);
-   var ref = firebase.database().ref().child('clicks').push(data, function(err) {
-     if (err) {  // Data was not written to firebase.
-       console.warn(err);
-     }
-   });
- });
-}
-
-function feelings_activate() {
-   document.getElementById('feelings').style.visibility = "visible";
-   initMap();
-}
-
-</script>
  <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAykwwAbyvWy5DiYn0-0aPBaPSrCqs9Gx4&libraries=visualization">
 </script>
