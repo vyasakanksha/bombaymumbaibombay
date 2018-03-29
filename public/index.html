@@ -2,6 +2,9 @@
 <html>
   <head>
    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script
+       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAykwwAbyvWy5DiYn0-0aPBaPSrCqs9Gx4&libraries=visualization">
+   </script>
    <script src="https://www.gstatic.com/firebasejs/4.10.1/firebase.js"></script>
    <script src="main.js"></script>
    <link rel="stylesheet" type="text/css" href="button.css">
@@ -16,7 +19,7 @@
   <body>
     <h1 align="center" style="font-family: Courier New, serif">Bombay To Mumbai And Bombay Again</h1>
     <h6 align="center" style="font-family: Courier New, serif">This project was the created by Shaina Patel and Akanksha Vyas with the support of the Bhau Daji Lad Museum, ZKM | Center for Art and Media Karlsruhe and Goethe Institut / Max Mueller Bhavan Mumbai. </h1>
-    <p style="font-family: Courier New, serif; font-size:13px"> Maps are traditionally representative artificial borders and boundaries that divide our world. We are here to create maps that connect us, the people of Bombay, of Mumbai, instead of dividing us. We live in a city of immigrants. Different people from vastly different backgrounds have happened upon this city in different ways, and we experience the city in different ways. Yet this city is the one thing that ties us together. Together, lets create maps that reflect this. </p>
+    <p style="font-family: Courier New, serif; font-size:13px"> Maps are traditionally represent artificial borders and boundaries that divide our world. We are here to create maps that connect us - the people of Bombay, of Mumbai - instead of dividing us. We live in a city of immigrants. Different people from vastly different backgrounds have happened upon this city in different ways, and we experience the city in different ways. Yet this city is the one thing that ties us together. Together, lets create maps that reflect this. We want to empower you to share and improve this project for a better tomorrow.</p>
     <p style="font-family: Courier New, serif; font-size:12px"> Shaina is an economist and budding data scientist. She is currently an economic statistics data analyst at Bloomberg. She has majored in economics at St. Xavier's College, Mumbai. Akanksha is mathematician and engineer with a Master’s in Probabilistic Algorithms. Currently, she is a co-founder (Engineering and Design lead) at a health-tech startup, Fited. </p>
     <div class="container">
        <div class="row">
@@ -65,13 +68,17 @@
          </div>
        </div>
     </div>
-    <div id="map"></div>
-    <div id="geog" class="container" style="visibility=hidden">
+    <div class="container" id="geog" style="visibility:hidden";>
+       <div id="floating-panel" style="visibility:hidden";>
+          <input type="button" value="1800's" id="button_1800"></input>
+          <input type="button" value="1900's" id="button_1900"></input>
+          <input type="button" value="2100's" id="button_2100"></input>
+       </div>
+       </div>
+    <div id="map">
+    </div>
     </div>
   </body>
 </html>
 
- <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAykwwAbyvWy5DiYn0-0aPBaPSrCqs9Gx4&libraries=visualization">
-</script>
 
