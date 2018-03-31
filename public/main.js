@@ -243,7 +243,7 @@ function initMapMigration() {
    });
 
    var infoBoxDiv = document.createElement('div');
-   makeInfoBox(infoBoxDiv, map_m, 'Did you migrate to Mumbai? Put a pin on the place where you were born and another one on a place in Mumbai where live now. Connect them.');
+   makeInfoBox(infoBoxDiv, map_m, 'Check of where most of most of India\'s migrant population is from. Did you migrate to Mumbai? Put a pin on the place where you were born and another one on a place in Mumbai where live now. Connect them.');
    map_m.controls[google.maps.ControlPosition.TOP_CENTER].push(infoBoxDiv);
 
    var marker = new google.maps.Marker({
